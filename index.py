@@ -2,7 +2,7 @@
 This file contains index operations.
 Run the following to check the available methods:
 
-.. code-block:: shellpython
+.. code-block:: shell
 
    python index.py --help
 
@@ -25,18 +25,15 @@ def load_data():
 
     def load_data():
         """Yields data from json file."""
-        # full_format_recipes.json source:
-        # https://www.kaggle.com/hugodarwood/epirecipes?select=full_format_recipes.json
         with open("data/animal-data.json", "r") as f:
             data = json.load(f)
-            for recipe in data:
+            for recipe in data["data"]:
                 yield {"_index": INDEX_NAME, "_source": recipe}
 
     data = load_data()
     print(f"Ingesting {INDEX_NAME} data")
     response = helpers.bulk(client, data, refresh=True)
     print(f"Data sent to your OpenSearch with response: {response}")
-    # client.bulk({ refresh: true, body }, console.log(result.body));
 
 
 @app.command("delete-index")
@@ -58,9 +55,6 @@ def get_mapping():
 
     # list of all the cluster's indices
     indices = client.indices.get_alias("*").keys()
-
-    # Example:
-    # dict_keys(['.kibana_1', 'epicurious-recipes'])
 
     mapping_data = client.indices.get_mapping(INDEX_NAME)
 
